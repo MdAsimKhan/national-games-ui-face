@@ -6,7 +6,8 @@
 import * as THREE from 'three';
 import * as ZapparThree from '@zappar/zappar-threejs';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import ZapparWebGLSnapshot from '@zappar/webgl-snapshot';
+import ZapparSharing from '@zappar/sharing';
+import * as ZapparVideoRecorder from '@zappar/video-recorder';
 
 import './index.css';
 
@@ -69,29 +70,28 @@ const faceTrackerGroup = new ZapparThree.FaceAnchorGroup(camera, faceTracker);
 scene.add(faceTrackerGroup);
 
 // Add some content
-const topimgpath = new URL("../assets/fire1.png", import.meta.url).href;
-const bottomimgpath = new URL("../assets/logo.png", import.meta.url).href;
+const topLogo = new URL("../assets/logo.png", import.meta.url).href;
+const bottomText = new URL("../assets/text.png", import.meta.url).href;
 
 const loader = new THREE.TextureLoader(manager);
 
-const texture = loader.load(topimgpath); // Replace with the path to your image
+const texture = loader.load(topLogo); // Replace with the path to your image
 const fire = new THREE.Mesh(
     new THREE.PlaneBufferGeometry(),
     new THREE.MeshBasicMaterial({ map: texture, transparent: true })
 );
-fire.scale.set(.6, .6, .4);
-fire.position.set(0, 0.25, -1);
+fire.scale.set(0.3, 0.17, 1);
+fire.position.set(0, 0.44, -1);
 scene.add(fire);
-// console.log(fire);
+console.log(fire);
 
 const bottom = new THREE.Mesh(
     new THREE.PlaneBufferGeometry(),
-    new THREE.MeshBasicMaterial({ map: loader.load(bottomimgpath), transparent: true })
+    new THREE.MeshBasicMaterial({ map: loader.load(bottomText), transparent: true })
 );
 bottom.scale.set(.6, .4, .2);
 bottom.position.set(0, -0.33, -1);
 scene.add(bottom);
-// console.log(bottom);
 
 // Start with the content group invisible
 faceTrackerGroup.visible = false;
@@ -135,18 +135,39 @@ faceTrackerGroup.faceTracker.onVisible.bind(() => { faceTrackerGroup.visible = t
 faceTrackerGroup.faceTracker.onNotVisible.bind(() => { faceTrackerGroup.visible = false; });
 
 // Get a reference to the 'Snapshot' button so we can attach a 'click' listener
-const placeButton = document.getElementById('snapshot') || document.createElement('div');
+const canvas = document.querySelector('canvas') || document.createElement('canvas');
 
-placeButton.addEventListener('click', () => {
-  // Get canvas from dom
-  const canvas = document.querySelector('canvas') || document.createElement('canvas');
-
+const imageBtn = document.getElementById('image') || document.createElement('div');
+imageBtn.addEventListener('click', () => {
   // Convert canvas data to url
   const url = canvas.toDataURL('image/jpeg', 0.8);
 
   // Take snapshot
-  ZapparWebGLSnapshot({
+  ZapparSharing({
     data: url,
+  });
+});
+
+// video capture
+const videoBtn = document.getElementById('video') || document.createElement('div');
+let isRecording = false;
+ZapparVideoRecorder.createCanvasVideoRecorder(canvas, {
+}).then((recorder) => {
+  videoBtn.addEventListener('click', () => {
+    if(!isRecording) {
+      isRecording = true;
+      recorder.start();
+    }
+    else {
+      isRecording = false;
+      recorder.stop();
+    }
+  });
+
+  recorder.onComplete.bind(async (res) => {
+    ZapparSharing({
+      data: await res.asDataURL(),
+    });
   });
 });
 

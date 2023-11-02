@@ -137,7 +137,7 @@ faceTrackerGroup.faceTracker.onNotVisible.bind(() => { faceTrackerGroup.visible 
 
 
 
-//====================Snapshot================================================//
+//====================Snapshot====================//
 const canvas = document.querySelector('canvas') || document.createElement('canvas');
 
 const imageBtn = document.getElementById('image') || document.createElement('div');

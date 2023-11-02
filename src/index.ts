@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import * as ZapparThree from '@zappar/zappar-threejs';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import ZapparSharing from '@zappar/sharing';
+import ZapparWebGLSnapshot from '@zappar/webgl-snapshot';
 import * as ZapparVideoRecorder from '@zappar/video-recorder';
 
 import './index.css';
@@ -146,7 +147,7 @@ imageBtn.addEventListener('click', () => {
   const url = canvas.toDataURL('image/jpeg', 0.8);
 
   // Take snapshot
-  ZapparSharing({
+  ZapparWebGLSnapshot({
     data: url,
   });
 });

@@ -169,7 +169,7 @@ ZapparVideoRecorder.createCanvasVideoRecorder(canvas, {
   });
 
   recorder.onComplete.bind(async (res) => {
-    ZapparSharing({
+    ZapparWebGLSnapshot({
       data: await res.asDataURL(),
     });
   });
